@@ -1,0 +1,94 @@
+
+<html>
+
+    <head>
+             <meta charset="utf-8">
+            <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+            <title>CRUD-CONSULTAR SQLITE</title>
+            <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+            <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+            <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+            <script>
+            var db;            
+            window.onload=function()
+            {
+                document.getElementById('buscar').addEventListener('click', searchData);
+                //nomedatabase, versaodatabase, nomedescricaodatabase, tamanhododatabase
+                db = window.openDatabase("test", "1.0", "Teste", 200000);
+            }
+            
+            function searchData(e)
+            {
+                db.transaction(consultaRecord, onSuccess, onError);
+            }
+                
+            function consultaRecord(transaction)
+            {
+                var   busca = document.getElementById('busca').value;
+                
+                //EXECUTA A CONSULTA DOS DADOS CADASTRADOS E ARMAZENA EM UM VETOR  
+                transaction.executeSql("SELECT * FROM automoveis WHERE marca='" +
+                busca + "' ", [], getSuccess, getError);
+            }
+            
+        	function getSuccess(tx, result)
+            {
+                var rows = result.rows;
+                //FOR QUE LÊ TODOS OS DADOS CADASTRADOS NA TABELA CONTATOS ARAMAZENADOS NO VETOR 
+                for(var x=0; x< rows.length; x++){
+                    var  valor  = result.rows[x].valor;
+                    var  potencia  = result.rows[x].potencia;
+                    var  ano  = result.rows[x].ano;
+                    var  modelo  = result.rows[x].modelo;
+                    var  marca  = result.rows[x].marca;
+                    //VAR OUT CONCATENA OS VALORES DOS ATRIBUTOS CONSULTADOS
+                    var  out = "<li>" +  modelo  +" R$" + valor +"<br/>" +  marca + " " + ano + "</li>";
+                    //MOSTRA O CONTEUDO DA VARIAVEL OUT NO LISTVIEW
+                    document.getElementById('dadoscadastrados').innerHTML +=out;
+                }
+                //RECARREGA OS DADOS A CADA CONSULTA REALIZADA
+                $('#dadoscadastrados').listview('refresh');
+            }
+    
+            function getError(e)
+            {
+                console.log(e);
+            }
+                
+            function onSuccess()
+            {
+                console.log("Cadastrado com Sucesso");
+            }
+                
+            function onError(error)
+            {
+                console.log(error);
+            }
+    </script>		
+    
+                    
+              
+    </head>
+    
+    <body>
+       <div data-role="page">
+           <div data-role="header"><h1>CRUD-CONSULTA SQLITE</h1></div>
+       <div data-role="main" class="ui-content">
+       
+         <label for="name">Digite a marca a ser buscada:</label>
+         <input type="text" id="busca">
+       
+       
+         <button id="buscar" type="submit">BUSCAR MARCA</button> 
+         <button id="voltar" onclick="location.href = 'index.html'">Voltar</button>
+         <br>
+         <br>
+         <ul id="dadoscadastrados" data-role="listview"></ul>
+        
+         
+         <script type="text/javascript" src="cordova.js"></script>
+        </div>
+        </div>    
+    </body>
+    
+    </html>

@@ -1,0 +1,129 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title>CRUD-ALTERAR SQLITE</title>
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+    <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <script>
+        var db;
+        window.onload = function () {
+            document.getElementById('buscar').addEventListener('click', searchData);
+            document.getElementById('alterar').addEventListener('click', updateDados);
+            // document.getElementById('excluirtudo').addEventListener('click', deleterudoData);
+
+            //nomedatabase, versaodatabase, nomedescricaodatabase, tamanhododatabase
+            db = window.openDatabase("test", "1.0", "Test", 200000);
+        }
+
+        function searchData(e) {
+            db.transaction(consultaRecord);
+        }
+        function updateDados(e) {
+            db.transaction(updateRecord);
+
+        }
+        function updateRecord(transaction) {
+            var valor = document.getElementById('valor').value;
+            var potencia = document.getElementById('potencia').value;
+            var marca = document.getElementById('marca').value;
+            var ano = document.getElementById('ano').value;
+            var modelo = document.getElementById('modelo').value;
+            let id = localStorage.getItem('carId')
+            var sql = "UPDATE automoveis SET valor= '" + valor + "',potencia= '" + potencia +
+                "',marca='" + marca + "',ano='" + ano + "',modelo='" + modelo + "' WHERE id='" + id + "' ";
+            console.log(sql);
+            transaction.executeSql(sql);
+            alert("Dados Alterados com Sucesso!!!");
+            location.reload();
+        }
+
+        function consultaRecord(transaction) {
+            var busca = document.getElementById('busca').value;
+
+            //EXECUTA A CONSULTA DOS DADOS CADASTRADOS E ARMAZENA EM UM VETOR  
+            transaction.executeSql("SELECT * FROM automoveis WHERE marca='" +
+                busca + "' ", [], getSuccess, getError);
+        }
+
+        function getSuccess(tx, result) {
+            var rows = result.rows;
+                //FOR QUE LÊ TODOS OS DADOS CADASTRADOS NA TABELA CONTATOS ARAMAZENADOS NO VETOR 
+                for(var x=0; x< rows.length; x++){
+                    var  valor  = result.rows[x].valor;
+                    var  potencia  = result.rows[x].potencia;
+                    var  ano  = result.rows[x].ano;
+                    var  modelo  = result.rows[x].modelo;
+                    var  marca  = result.rows[x].marca;
+                    var  id  = result.rows[x].id;
+
+                    localStorage.setItem('carId',id)
+
+                    //VAR OUT CONCATENA OS VALORES DOS ATRIBUTOS CONSULTADOS
+                    var  out = "<li>" +  modelo  +" R$" + valor +"<br/>" +  marca + " " + ano + "</li>";
+                    //MOSTRA O CONTEUDO DA VARIAVEL OUT NO LISTVIEW
+                    document.getElementById('dadoscadastrados').innerHTML +=out;
+                }
+                //RECARREGA OS DADOS A CADA CONSULTA REALIZADA
+                $('#dadoscadastrados').listview('refresh');
+        }
+
+        function getError(e) {
+            console.log(e);
+        }
+
+        function onSuccess() {
+            console.log("Cadastrado com Sucesso");
+        }
+
+        function onError(error) {
+            console.log(error);
+        }
+    </script>
+
+
+
+</head>
+
+<body>
+    <div data-role="page">
+        <div data-role="header">
+            <h1>CRUD-ALTERAR SQLITE</h1>
+        </div>
+        <div data-role="main" class="ui-content">
+
+            <label for="name">Digite a marca a ser buscada:</label>
+            <input type="text" id="busca">
+
+
+            <button id="buscar" type="submit">BUSCAR MARCA</button>
+
+            <label for="name">Marca:</label>
+            <input type="text" id="marca">
+            <label for="email">Modelo:</label>
+            <input type="text" id="modelo">
+            <label for="email">Potência:</label>
+            <input type="text" id="potencia">
+            <label for="email">Ano:</label>
+            <input type="text" id="ano">
+            <label for="email">Valor:</label>
+            <input type="text" id="valor">
+
+            <button id="alterar" type="submit">ALTERAR</button>
+
+            <br>
+            <br>
+            <ul id="dadoscadastrados" data-role="listview"></ul>
+            <br><br>
+            <button id="voltar"><a onclick="location.href='index.html'">VOLTAR</a></button>
+
+
+
+            <script type="text/javascript" src="cordova.js"></script>
+        </div>
+    </div>
+</body>
+
+</html>

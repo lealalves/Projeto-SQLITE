@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title>BANCO DE DADOS SQLITE</title>
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+    <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <script>
+        var db;
+        window.onload = function () {
+            document.getElementById('salvar').addEventListener('click', saveData);
+            //nomedatabase, versaodatabase, nomedescricaodatabase, tamanhododatabase
+            db = window.openDatabase("test", "1.0", "Teste", 200000);
+        }
+        function saveData(e) {
+            db.transaction(saveRecord);
+        }
+
+        function saveRecord(transaction) {
+            var nome = document.getElementById('name').value;
+            var email = document.getElementById('email').value;
+            transaction.executeSql('CREATE TABLE IF NOT EXISTS contatos(id INTEGER PRIMARY KEY AUTOINCREMENT, nome TEXT NOT NULL, email TEXT NOT NULL)');
+
+            var sql = "insert into contatos(nome,email) VALUES ('" + nome + "', '" + email + "')";
+            transaction.executeSql(sql);
+            transaction.executeSql("SELECT * FROM contatos", [], getSuccess);
+        }
+        function getSuccess(tx, result) {
+            var rows = result.rows;
+            for (var x = 0; x < rows.length; x++) {
+                var name = result.rows[x].nome;
+                var email = result.rows[x].email;
+                var out = "<li>" + name + "<br/>" + email + "</li>";
+                document.getElementById('dadoscadastrados').innerHTML += out;    
+            }
+            $('#dadoscadastrados').listview('refresh')                       
+        }
+    </script>
+</head>
+
+<body>
+    <div data-role="page">
+        <div data-role="header">
+            <h1>CRUD SQLITE</h1>
+        </div>
+        <div data-role="main" class="ui-content">
+            <button id="salvar" onclick="location.href = 'cadastrar.html'">Cadastrar</button>
+            <button id="consultar" onclick="location.href = 'consultar.html'">Consultar</button>
+            <button id="consultartodos" onclick="location.href = 'consultartodos.html'">Consultar Todos</button>
+            <button id="excluir" onclick="location.href = 'excluir.html'">Excluir</button>
+            <button id="alterar" onclick="location.href = 'alterar.html'">Alterar</button>
+        </div>
+    </div>
+    <script type="text/javascript" src="cordova.js"></script>
+</body>
+
+</html>
