@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title>BANCO DE DADOS SQLITE</title>
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+    <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <script>
+        var db;
+        window.onload = function () {
+            document.getElementById('salvar').addEventListener('click', saveData);
+            //nomedatabase, versaodatabase, nomedescricaodatabase, tamanhododatabase
+            db = window.openDatabase("atividade", "1.0", "Teste", 200000);
+        }
+        function saveData(e) {
+            db.transaction(saveRecord);
+        }
+
+        function saveRecord(transaction) {
+            var valor = document.getElementById('valor').value;
+            var potencia = document.getElementById('potencia').value;
+            var marca = document.getElementById('marca').value;
+            var ano = document.getElementById('ano').value;
+            var modelo = document.getElementById('modelo').value;
+            transaction.executeSql(
+'CREATE TABLE IF NOT EXISTS automoveis(id INTEGER PRIMARY KEY AUTOINCREMENT, valor TEXT NOT NULL, potencia TEXT NOT NULL, ano TEXT NOT NULL, modelo TEXT NOT NULL, marca TEXT NOT NULL)');
+
+            var sql = "insert into automoveis(valor,potencia,ano,modelo,marca) VALUES ('"+ valor +"','" + potencia + "', '" + ano + "','"+ modelo +"','"+ marca +"')";
+            transaction.executeSql(sql);
+            transaction.executeSql("SELECT * FROM automoveis", [], getSuccess);
+        }
+        function getSuccess(tx, result)
+            {
+                var rows = result.rows;
+                //FOR QUE LÊ TODOS OS DADOS CADASTRADOS NA TABELA CONTATOS ARAMAZENADOS NO VETOR 
+                for(var x=0; x< rows.length; x++){
+                    var  valor  = result.rows[x].valor;
+                    var  potencia  = result.rows[x].potencia;
+                    var  ano  = result.rows[x].ano;
+                    var  modelo  = result.rows[x].modelo;
+                    var  marca  = result.rows[x].marca;
+                    //VAR OUT CONCATENA OS VALORES DOS ATRIBUTOS CONSULTADOS
+                    var  out = "<li>" +  modelo  +" R$" + valor +"<br/>" +  marca + " " + ano + "</li>";
+                    //MOSTRA O CONTEUDO DA VARIAVEL OUT NO LISTVIEW
+                    document.getElementById('dadoscadastrados').innerHTML +=out;
+                }
+                //RECARREGA OS DADOS A CADA CONSULTA REALIZADA
+                $('#dadoscadastrados').listview('refresh');
+            }
+    </script>
+</head>
+
+<body>
+    <div data-role="page">
+        <div data-role="header">
+            <h1>CRUD SQLITE</h1>
+        </div>
+        <div data-role="main" class="ui-content">
+            <label for="name">Marca:</label>
+            <input type="text" id="marca">
+            <label for="email">Modelo:</label>
+            <input type="text" id="modelo">
+            <label for="email">Potência:</label>
+            <input type="text" id="potencia">
+            <label for="email">Ano:</label>
+            <input type="text" id="ano">
+            <label for="email">Valor:</label>
+            <input type="text" id="valor">
+            <button id="salvar" type="submit">Cadastrar</button>
+            <br><br>
+            <ul id="dadoscadastrados" data-role="listview"></ul>
+            <br>
+        </div>
+    </div>
+    <script type="text/javascript" src="cordova.js"></script>
+</body>
+
+</html>
